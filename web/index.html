@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mira Math AI - OpenAI MATH Tutor & Solver</title>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header / Navigation Bar -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 12h8M12 8v8M9 9l6 6"></path>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>Mira Math <span>AI</span></h1>
+                    <span class="badge">OpenAI MATH v1.0</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="themeToggleBtn" class="icon-btn" title="Toggle Theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <button id="shareAppBtn" class="icon-btn" title="Share App">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-btn active" data-tab="solver">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>
+                <span>AI Solver</span>
+            </button>
+            <button class="nav-btn" data-tab="practice">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>MATH Benchmark</span>
+            </button>
+            <button class="nav-btn" data-tab="keypad">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M7 8h2v2H7zM11 8h2v2h-2zM15 8h2v2h-2zM7 12h2v2H7zM11 12h2v2h-2zM15 12h2v2h-2zM7 16h10v2H7z"></path></svg>
+                <span>Math Keyboard</span>
+            </button>
+            <button class="nav-btn" data-tab="guide">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>OpenAI MATH Taxonomy</span>
+            </button>
+        </nav>
+
+        <main class="content-area">
+            <!-- TAB 1: AI SOLVER -->
+            <section id="solverTab" class="tab-pane active">
+                <div class="card solver-card">
+                    <div class="card-header">
+                        <h2>Step-by-Step AI Problem Solver</h2>
+                        <span class="sub-label">Supports LaTeX notation, AMC/AIME math & step decomposition</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="mathInput">Enter Math Problem or LaTeX Equation:</label>
+                        <textarea id="mathInput" placeholder="e.g., Solve for x: 3x^2 + 5x - 2 = 0&#10;or: Find the remainder when 7^{2024} is divided by 100&#10;or: Evaluate \int_{0}^{\pi} x \sin(x) dx"></textarea>
+                    </div>
+
+                    <!-- Quick Shortcuts Bar -->
+                    <div class="quick-tokens">
+                        <button class="token-btn" data-insert="\frac{a}{b}">\frac{a}{b}</button>
+                        <button class="token-btn" data-insert="x^2">x²</button>
+                        <button class="token-btn" data-insert="\sqrt{x}">\sqrt{x}</button>
+                        <button class="token-btn" data-insert="\sum_{i=1}^{n}">\sum</button>
+                        <button class="token-btn" data-insert="\int_{a}^{b}">\int</button>
+                        <button class="token-btn" data-insert="\binom{n}{k}">\binom{n}{k}</button>
+                        <button class="token-btn" data-insert="\lim_{x \to \infty}">\lim</button>
+                        <button class="token-btn" data-insert="\pmod{m}">\pmod{m}</button>
+                    </div>
+
+                    <div class="solver-controls">
+                        <div class="selector-group">
+                            <label for="subjectSelect">Subject:</label>
+                            <select id="subjectSelect">
+                                <option value="algebra">Algebra</option>
+                                <option value="counting_and_probability">Counting & Probability</option>
+                                <option value="geometry">Geometry</option>
+                                <option value="intermediate_algebra">Intermediate Algebra</option>
+                                <option value="number_theory">Number Theory</option>
+                                <option value="prealgebra">Prealgebra</option>
+                                <option value="precalculus">Precalculus</option>
+                            </select>
+                        </div>
+                        <div class="selector-group">
+                            <label for="levelSelect">Difficulty:</label>
+                            <select id="levelSelect">
+                                <option value="1">Level 1 (Introductory)</option>
+                                <option value="2">Level 2 (High School)</option>
+                                <option value="3">Level 3 (AMC 10/12)</option>
+                                <option value="4" selected>Level 4 (AIME Standard)</option>
+                                <option value="5">Level 5 (USAMO / Olympiad)</option>
+                            </select>
+                        </div>
+                        <button id="solveBtn" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                            <span>Solve & Derive Steps</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Preview & Solution Output -->
+                <div id="solutionSection" class="card solution-card hidden">
+                    <div class="card-header">
+                        <div class="solution-meta">
+                            <span id="solutionSubjectTag" class="tag">Algebra</span>
+                            <span id="solutionLevelTag" class="tag tag-level">Level 4</span>
+                        </div>
+                        <div class="solution-actions">
+                            <button id="copySolutionBtn" class="icon-btn-text" title="Copy Solution">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="problem-display">
+                        <h3>Problem Statement</h3>
+                        <div id="problemLatex" class="math-render-box"></div>
+                    </div>
+
+                    <div class="derivation-steps">
+                        <h3>Step-by-Step Rigorous Derivation</h3>
+                        <div id="stepsContainer"></div>
+                    </div>
+
+                    <div class="final-answer-box">
+                        <span class="final-label">Final Boxed Answer:</span>
+                        <div id="finalAnswerRender" class="math-boxed"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: MATH BENCHMARK PRACTICE -->
+            <section id="practiceTab" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>OpenAI MATH Dataset Benchmark Explorer</h2>
+                        <span class="sub-label">Select from 12,500 curated competition-level problems</span>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="filterSubject">
+                            <option value="all">All Subjects (7 Categories)</option>
+                            <option value="Algebra">Algebra</option>
+                            <option value="Counting & Probability">Counting & Probability</option>
+                            <option value="Geometry">Geometry</option>
+                            <option value="Intermediate Algebra">Intermediate Algebra</option>
+                            <option value="Number Theory">Number Theory</option>
+                            <option value="Prealgebra">Prealgebra</option>
+                            <option value="Precalculus">Precalculus</option>
+                        </select>
+                        <select id="filterLevel">
+                            <option value="all">All Difficulty Levels (1-5)</option>
+                            <option value="Level 1">Level 1</option>
+                            <option value="Level 2">Level 2</option>
+                            <option value="Level 3">Level 3</option>
+                            <option value="Level 4">Level 4</option>
+                            <option value="Level 5">Level 5</option>
+                        </select>
+                        <button id="randomProblemBtn" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
+                            <span>Random Problem</span>
+                        </button>
+                    </div>
+
+                    <div id="problemList" class="problem-grid"></div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MATH KEYPAD -->
+            <section id="keypadTab" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Interactive LaTeX Scientific Keypad</h2>
+                        <span class="sub-label">Build complex mathematical expressions effortlessly</span>
+                    </div>
+                    <div class="keypad-display">
+                        <div id="keypadPreview" class="math-render-box"></div>
+                        <input type="text" id="keypadRawInput" readonly placeholder="LaTeX string will appear here...">
+                    </div>
+                    <div class="keypad-grid">
+                        <!-- Row 1: Basic Math & Fractions -->
+                        <button class="key-btn" data-key="7">7</button>
+                        <button class="key-btn" data-key="8">8</button>
+                        <button class="key-btn" data-key="9">9</button>
+                        <button class="key-btn key-op" data-key=" \div ">÷</button>
+                        <button class="key-btn key-op" data-key="\frac{}{} ">a/b</button>
+                        <button class="key-btn key-op" data-key="x">x</button>
+                        
+                        <!-- Row 2: Powers & Roots -->
+                        <button class="key-btn" data-key="4">4</button>
+                        <button class="key-btn" data-key="5">5</button>
+                        <button class="key-btn" data-key="6">6</button>
+                        <button class="key-btn key-op" data-key=" \times ">×</button>
+                        <button class="key-btn key-op" data-key="^{2}">x²</button>
+                        <button class="key-btn key-op" data-key="^{}">xⁿ</button>
+
+                        <!-- Row 3: Symbols & Functions -->
+                        <button class="key-btn" data-key="1">1</button>
+                        <button class="key-btn" data-key="2">2</button>
+                        <button class="key-btn" data-key="3">3</button>
+                        <button class="key-btn key-op" data-key=" - ">-</button>
+                        <button class="key-btn key-op" data-key="\sqrt{}">\sqrt{x}</button>
+                        <button class="key-btn key-op" data-key="\pi">\pi</button>
+
+                        <!-- Row 4: Calculus & Combinatorics -->
+                        <button class="key-btn" data-key="0">0</button>
+                        <button class="key-btn" data-key=".">.</button>
+                        <button class="key-btn" data-key=" = ">=</button>
+                        <button class="key-btn key-op" data-key=" + ">+</button>
+                        <button class="key-btn key-op" data-key="\sum_{n=1}^{\infty}">\sum</button>
+                        <button class="key-btn key-op" data-key="\int_{0}^{\infty}">\int</button>
+
+                        <!-- Row 5: Actions -->
+                        <button class="key-btn key-fn" data-action="backspace">⌫</button>
+                        <button class="key-btn key-fn" data-action="clear">CLEAR</button>
+                        <button class="key-btn key-fn key-wide" data-action="sendToSolver">SEND TO SOLVER ➔</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: TAXONOMY & ARCHITECTURE -->
+            <section id="guideTab" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>OpenAI MATH Research Taxonomy & Architecture</h2>
+                        <span class="sub-label">Overview of dataset structure, LaTeX standards, and evaluation methods</span>
+                    </div>
+                    <div class="guide-content">
+                        <div class="guide-grid">
+                            <div class="guide-item">
+                                <h3>1. OpenAI MATH Dataset Overview</h3>
+                                <p>The MATH benchmark consists of 12,500 high-school competition mathematical problems (AMC 10, AMC 12, AIME, USAMO) categorized into 7 sub-disciplines with difficulty standard from Level 1 to Level 5.</p>
+                            </div>
+                            <div class="guide-item">
+                                <h3>2. Universal Answer Normalization</h3>
+                                <p>Answers are explicitly enclosed inside <code>\boxed{...}</code> tags. The evaluation pipeline uses recursive LaTeX parsing and SymPy algebraic equivalency checks to grade model output automatically.</p>
+                            </div>
+                            <div class="guide-item">
+                                <h3>3. Chain-of-Thought (CoT) & Step-Decomposition</h3>
+                                <p>Every problem includes step-by-step human explanations. Models trained or prompted on CoT step derivation achieve vastly improved accuracy on Level 4 & 5 competition math.</p>
+                            </div>
+                            <div class="guide-item">
+                                <h3>4. Android Native & Web Synthesis</h3>
+                                <p>Mira Math AI integrates KaTeX for client-side zero-latency math rendering and Java Android native bridge for tactile haptics, clipboard integration, and native sharing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- KaTeX Javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

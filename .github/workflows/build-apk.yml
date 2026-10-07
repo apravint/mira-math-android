@@ -1,0 +1,121 @@
+name: Build and Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android Build Tools
+        run: |
+          sdkmanager "build-tools;34.0.0" "platforms;android-34"
+
+      - name: Prepare Web Assets & Copy for AAPT
+        run: |
+          mkdir -p assets/web
+          cp -r web/* assets/
+          cp -r web/* assets/web/
+          ls -la assets/
+          ls -la assets/web/
+
+      - name: Compile Resources with AAPT
+        run: |
+          aapt package -f -m \
+            -J android/app/src/main/java \
+            -M android/app/src/main/AndroidManifest.xml \
+            -S android/app/src/main/res \
+            -I $ANDROID_HOME/platforms/android-34/android.jar \
+            -A assets \
+            -F compiled.ap_
+
+      - name: Compile Java Code
+        run: |
+          mkdir -p bin/classes
+          javac -d bin/classes \
+            -classpath $ANDROID_HOME/platforms/android-34/android.jar \
+            $(find android/app/src/main/java -name "*.java")
+
+      - name: Convert Java Bytecode to DEX with D8
+        run: |
+          $ANDROID_HOME/build-tools/34.0.0/d8 \
+            --output bin/ \
+            --lib $ANDROID_HOME/platforms/android-34/android.jar \
+            $(find bin/classes -name "*.class")
+
+      - name: Package Unaligned APK
+        run: |
+          cd bin
+          cp ../compiled.ap_ unaligned.apk
+          zip -g unaligned.apk classes.dex
+
+      - name: ZipAlign APK (4-byte alignment)
+        run: |
+          $ANDROID_HOME/build-tools/34.0.0/zipalign -v 4 bin/unaligned.apk bin/aligned.apk
+
+      - name: Create Keystore & Sign APK with apksigner (V1, V2, V3 enabled)
+        run: |
+          keytool -genkey -v -keystore release.keystore \
+            -alias miramath -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Mira Math, OU=AI, O=Apravint, L=Chennai, S=TN, C=IN" \
+            -storepass android -keypass android
+          
+          $ANDROID_HOME/build-tools/34.0.0/apksigner sign \
+            --ks release.keystore \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --out bin/MiraMath.apk \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            bin/aligned.apk
+
+      - name: Verify Signed APK
+        run: |
+          $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose bin/MiraMath.apk
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiraMath-APK
+          path: bin/MiraMath.apk
+
+      - name: Create GitHub Release and Upload APK
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        with:
+          name: "Mira Math AI v1.0.0"
+          tag_name: "v1.0.0"
+          body: |
+            ## 🚀 Mira Math AI - OpenAI MATH Competition Tutor & Solver v1.0.0
+
+            ### 🌟 Key Features:
+            - **OpenAI MATH Benchmark Integration**: Covers 12,500 competition math problems across 7 disciplines (Algebra, Counting & Probability, Geometry, Intermediate Algebra, Number Theory, Prealgebra, Precalculus) from Levels 1 to 5.
+            - **Step-by-Step Chain-of-Thought (CoT) Derivations**: Complete solution breakdowns with LaTeX math typesetting powered by KaTeX.
+            - **Interactive Math Keyboard**: Scientific symbol editor for building expressions effortlessly.
+            - **Native Android Hardware Acceleration**: Embedded WebView with native tactile haptics, clipboard integration, and native Android sharing bridge.
+            - **Universal Installation Ready**: Built with 4-byte ZipAlignment & apksigner V1/V2/V3 signatures for Android 7.0 - 15+.
+          files: |
+            bin/MiraMath.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
