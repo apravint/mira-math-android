@@ -39,7 +39,7 @@ jobs:
 
       - name: Compile Resources with AAPT
         run: |
-          aapt package -f -m \
+          $ANDROID_HOME/build-tools/34.0.0/aapt package -f -m \
             -J android/app/src/main/java \
             -M android/app/src/main/AndroidManifest.xml \
             -S android/app/src/main/res \
