@@ -1,6 +1,14 @@
-# Mira Math AI - OpenAI MATH Competition Tutor & Solver 🧮🤖
+# Mira Math AI - OpenAI MATH Competition Tutor & Solver 🧮🤖 (`v1.1.0`)
 
-> **Mira Math AI** is an advanced Android app and Web application designed for solving competition-level mathematical problems based on the landmark **OpenAI MATH dataset research paper** (*"Measuring Mathematical Problem Solving With the MATH Dataset"* by Hendrycks et al.).
+[![GitHub Release](https://img.shields.io/github/v/release/apravint/mira-math-android?color=cyan&label=Latest%20Release)](https://github.com/apravint/mira-math-android/releases/tag/v1.0.0)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-00F0FF?style=flat&logo=github)](https://apravint.github.io/mira-math-android/)
+[![Target SDK](https://img.shields.io/badge/Target%20SDK-35%20(Android%2015)-green.svg)](https://developer.android.com/about/versions/15)
+[![Edge-to-Edge](https://img.shields.io/badge/Display-Edge--to--Edge%20Compliant-purple.svg)](https://developer.android.com/develop/ui/views/layout/edge-to-edge)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+> 🌐 **Try it Live in Your Browser**: [Launch Mira Math AI Web Edition](https://apravint.github.io/mira-math-android/)
+
+> **Mira Math AI** is an advanced Android app and Web application designed for solving competition-level mathematical problems based on the landmark **OpenAI MATH dataset research paper** (*"Measuring Mathematical Problem Solving With the MATH Dataset"* by Hendrycks et al.). Compatible with modern Android 15 (SDK 35) Edge-to-Edge display insets and Predictive Back navigation.
 
 ---
 
